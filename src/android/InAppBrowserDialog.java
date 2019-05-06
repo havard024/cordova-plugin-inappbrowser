@@ -54,4 +54,24 @@ public class InAppBrowserDialog extends Dialog {
             }
         }
     }
+
+    // TODO: Send outside click back to caller so it can handle bottom tabbar clicks
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (isShowing() && (event.getAction() == MotionEvent.ACTION_DOWN
+                && isOutOfBounds(getContext(), event) && getWindow().peekDecorView() != null)) {
+            this.inAppBrowser.tabClick(event);
+        }
+        return false;
+    }
+
+    private boolean isOutOfBounds(Context context, MotionEvent event) {
+        final int x = (int) event.getX();
+        final int y = (int) event.getY();
+        final int slop = ViewConfiguration.get(context).getScaledWindowTouchSlop();
+        final View decorView = getWindow().getDecorView();
+        return (x < -slop) || (y < -slop)
+                || (x > (decorView.getWidth()+slop))
+                || (y > (decorView.getHeight()+slop));
+    }
 }

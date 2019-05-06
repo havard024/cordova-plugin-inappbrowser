@@ -85,6 +85,11 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
+import android.graphics.Point;
+import android.view.MotionEvent;
+import android.util.DisplayMetrics;
+import android.content.res.ColorStateList;
+
 @SuppressLint("SetJavaScriptEnabled")
 public class InAppBrowser extends CordovaPlugin {
 
@@ -785,6 +790,8 @@ public class InAppBrowser extends CordovaPlugin {
                 dialog.getWindow().getAttributes().windowAnimations = android.R.style.Animation_Dialog;
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                // TODO: Is below needed?
+                // dialog.setCanceledOnTouchOutside(true);
                 dialog.setCancelable(true);
                 dialog.setInAppBroswer(getInAppBrowser());
 
@@ -811,6 +818,8 @@ public class InAppBrowser extends CordovaPlugin {
                 if (leftToRight) actionButtonLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
                 else actionButtonLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
                 actionButtonContainer.setLayoutParams(actionButtonLayoutParams);
+                // TODO: Is below needed?
+                // actionButtonContainer.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
                 actionButtonContainer.setHorizontalGravity(Gravity.LEFT);
                 actionButtonContainer.setVerticalGravity(Gravity.CENTER_VERTICAL);
                 actionButtonContainer.setId(leftToRight ? Integer.valueOf(5) : Integer.valueOf(1));
@@ -876,7 +885,29 @@ public class InAppBrowser extends CordovaPlugin {
                 edittext.setLayoutParams(textLayoutParams);
                 edittext.setId(Integer.valueOf(4));
                 edittext.setSingleLine(true);
-                edittext.setText(url);
+                // Using website title as header, so we don't want to set url as title here. Also set the text color
+                // edittext.setText(url);
+                edittext.setText("");
+
+                if (navigationButtonColor != "") {
+                    int[][] states = new int[][] {
+                            new int[] { android.R.attr.state_enabled}, // enabled
+                            new int[] {-android.R.attr.state_enabled}, // disabled
+                            new int[] {-android.R.attr.state_checked}, // unchecked
+                            new int[] { android.R.attr.state_pressed}  // pressed
+                    };
+
+                    int[] colors = new int[] {
+                            android.graphics.Color.parseColor("#ffd100"),
+                            android.graphics.Color.parseColor("#ffd100"),
+                            android.graphics.Color.parseColor("#ffd100"),
+                            android.graphics.Color.parseColor("#ffd100")
+                    };
+
+                    ColorStateList myList = new ColorStateList(states, colors);
+                    edittext.getBackground().setColorFilter(android.graphics.Color.BLACK, PorterDuff.Mode.SRC_ATOP);
+                    edittext.setTextColor(myList);
+                }
                 edittext.setInputType(InputType.TYPE_TEXT_VARIATION_URI);
                 edittext.setImeOptions(EditorInfo.IME_ACTION_GO);
                 edittext.setInputType(InputType.TYPE_NULL); // Will not except input... Makes the text NON-EDITABLE
@@ -895,7 +926,8 @@ public class InAppBrowser extends CordovaPlugin {
                 // Header Close/Done button
                 int closeButtonId = leftToRight ? 1 : 5;
                 View close = createCloseButton(closeButtonId);
-                toolbar.addView(close);
+                // Hide close button
+                // toolbar.addView(close);
 
                 // Footer
                 RelativeLayout footer = new RelativeLayout(cordova.getActivity());
@@ -1032,7 +1064,7 @@ public class InAppBrowser extends CordovaPlugin {
 
                 // Add the back and forward buttons to our action button container layout
                 actionButtonContainer.addView(back);
-                actionButtonContainer.addView(forward);
+                // actionButtonContainer.addView(forward);
 
                 // Add the views to our toolbar if they haven't been disabled
                 if (!hideNavigationButtons) toolbar.addView(actionButtonContainer);
@@ -1057,8 +1089,24 @@ public class InAppBrowser extends CordovaPlugin {
                 WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
                 lp.copyFrom(dialog.getWindow().getAttributes());
                 lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-                lp.height = WindowManager.LayoutParams.MATCH_PARENT;
 
+                // Attach dialog to top of view
+                lp.gravity = Gravity.TOP;
+
+                // Set custom height so bottom tabbar becomes visible
+                // int height = getResources().getDimensionPixelSize(R.dimen.popup_height);
+
+                Point size = new Point();
+                cordova.getActivity().getWindowManager().getDefaultDisplay().getSize(size);
+
+                float density = cordova.getActivity().getResources()
+                        .getDisplayMetrics()
+                        .density;
+
+                // TODO: Make 82 configurable from client
+                lp.height = size.y - Math.round(82f * density); //(int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dpToPx(57), cordova.getActivity().getResources().getDisplayMetrics()); //WindowManager.LayoutParams.MATCH_PARENT;
+
+                // dialog.getWindow().setGravity(Gravity.LEFT | Gravity.TOP)
                 dialog.setContentView(main);
                 dialog.show();
                 dialog.getWindow().setAttributes(lp);
@@ -1385,7 +1433,7 @@ public class InAppBrowser extends CordovaPlugin {
 
             // Update the UI if we haven't already
             if (!newloc.equals(edittext.getText().toString())) {
-                edittext.setText(newloc);
+                // edittext.setText(newloc);
             }
 
             try {
@@ -1419,6 +1467,7 @@ public class InAppBrowser extends CordovaPlugin {
             view.clearFocus();
             view.requestFocus();
 
+            edittext.setText(view.getTitle());
             try {
                 JSONObject obj = new JSONObject();
                 obj.put("type", LOAD_STOP_EVENT);
@@ -1482,6 +1531,32 @@ public class InAppBrowser extends CordovaPlugin {
 
             // By default handle 401 like we'd normally do!
             super.onReceivedHttpAuthRequest(view, handler, host, realm);
+        }
+    }
+
+    public void tabClick(MotionEvent event) {
+        try {
+            JSONObject obj = new JSONObject();
+            obj.put("type", LOAD_STOP_EVENT);
+
+            JSONObject evObj = new JSONObject();
+            evObj.put("x", (int)event.getX());
+            evObj.put("y", (int)event.getY());
+            Point size = new Point();
+            cordova.getActivity().getWindowManager().getDefaultDisplay().getSize(size);
+
+            obj.put("click", evObj);
+
+            obj.put("width", size.x);
+            obj.put("height", size.y);
+
+            float density = this.cordova.getActivity().getResources()
+                    .getDisplayMetrics()
+                    .density;
+            obj.put("density", density);
+            sendUpdate(obj, true);
+        } catch (JSONException ex) {
+            LOG.d(LOG_TAG, "Should never happen");
         }
     }
 }
