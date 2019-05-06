@@ -257,15 +257,19 @@ static CDVUIInAppBrowser* instance = nil;
     // Run later to avoid the "took a long time" log message.
     dispatch_async(dispatch_get_main_queue(), ^{
         if (weakSelf.inAppBrowserViewController != nil) {
-            if (!tmpWindow) {
             CGRect frame = [[UIScreen mainScreen] bounds];
+
+            // Set height equal view height minus tabbar height to make tabbar visible
+            frame.size.height -= 84;
+            if (!tmpWindow) {
                 tmpWindow = [[UIWindow alloc] initWithFrame:frame];
             }
             UIViewController *tmpController = [[UIViewController alloc] init];
             [tmpWindow setRootViewController:tmpController];
 
             [tmpWindow makeKeyAndVisible];
-            [tmpController presentViewController:nav animated:YES completion:nil];
+            // [tmpController presentViewController:nav animated:YES completion:nil];
+            [tmpController presentViewController:nav animated:NO completion:nil];
         }
     });
 }
@@ -289,7 +293,7 @@ static CDVUIInAppBrowser* instance = nil;
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.inAppBrowserViewController != nil) {
             _previousStatusBarStyle = -1;
-            [self.inAppBrowserViewController.presentingViewController dismissViewControllerAnimated:YES completion:^{
+            [self.inAppBrowserViewController.presentingViewController dismissViewControllerAnimated:NO completion:^{
                 [[[[UIApplication sharedApplication] delegate] window] makeKeyAndVisible];
           }];
         }
@@ -765,17 +769,22 @@ static CDVUIInAppBrowser* instance = nil;
     // Filter out Navigation Buttons if user requests so
     if (_browserOptions.hidenavigationbuttons) {
         if (_browserOptions.lefttoright) {
-            [self.toolbar setItems:@[flexibleSpaceButton, self.closeButton]];
+            // [self.toolbar setItems:@[flexibleSpaceButton, self.closeButton]];
+            [self.toolbar setItems:@[flexibleSpaceButton]];
         } else {
-            [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton]];
+            // [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton]];
+            [self.toolbar setItems:@[flexibleSpaceButton]];
         }
     } else if (_browserOptions.lefttoright) {
-        [self.toolbar setItems:@[self.backButton, fixedSpaceButton, self.forwardButton, flexibleSpaceButton, self.closeButton]];
+        // [self.toolbar setItems:@[self.backButton, fixedSpaceButton, self.forwardButton, flexibleSpaceButton, self.closeButton]];
+        [self.toolbar setItems:@[self.backButton, fixedSpaceButton, flexibleSpaceButton]];
     } else {
-        [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, self.backButton, fixedSpaceButton, self.forwardButton]];
+        // [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, self.backButton, fixedSpaceButton, self.forwardButton]];
+        [self.toolbar setItems:@[flexibleSpaceButton, self.backButton, fixedSpaceButton]];
     }
 
-    self.view.backgroundColor = [UIColor grayColor];
+    // self.view.backgroundColor = [UIColor grayColor];
+    self.view.backgroundColor = [UIColor blackColor];
     [self.view addSubview:self.toolbar];
     [self.view addSubview:self.addressLabel];
     [self.view addSubview:self.spinner];
@@ -949,11 +958,11 @@ static CDVUIInAppBrowser* instance = nil;
     // Run later to avoid the "took a long time" log message.
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([weakSelf respondsToSelector:@selector(presentingViewController)]) {
-            [[weakSelf presentingViewController] dismissViewControllerAnimated:YES completion:^{
+            [[weakSelf presentingViewController] dismissViewControllerAnimated:NO completion:^{
                 [[[[UIApplication sharedApplication] delegate] window] makeKeyAndVisible];
             }];
         } else {
-            [[weakSelf parentViewController] dismissViewControllerAnimated:YES completion:^{
+            [[weakSelf parentViewController] dismissViewControllerAnimated:NO completion:^{
                 [[[[UIApplication sharedApplication] delegate] window] makeKeyAndVisible];
             }];
         }
