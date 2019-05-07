@@ -901,15 +901,15 @@ BOOL isExiting = FALSE;
         }
     } else if (_browserOptions.lefttoright) {
         if (_browserOptions.hideclosebutton) {
-            [self.toolbar setItems:@[self.backButton, fixedSpaceButton, self.forwardButton, flexibleSpaceButton]];
+            [self.toolbar setItems:@[self.backButton, fixedSpaceButton, flexibleSpaceButton]];
         } else {
-            [self.toolbar setItems:@[self.backButton, fixedSpaceButton, self.forwardButton, flexibleSpaceButton, self.closeButton]];
+            [self.toolbar setItems:@[self.backButton, fixedSpaceButton, flexibleSpaceButton, self.closeButton]];
         }
     } else {
         if (_browserOptions.hideclosebutton) {
-            [self.toolbar setItems:@[flexibleSpaceButton, self.backButton, fixedSpaceButton, self.forwardButton]];
+            [self.toolbar setItems:@[flexibleSpaceButton, self.backButton, fixedSpaceButton]];
         } else {
-            [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, self.backButton, fixedSpaceButton, self.forwardButton]];
+            [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, self.backButton, fixedSpaceButton]];
         }
     }
     
