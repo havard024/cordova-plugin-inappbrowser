@@ -315,6 +315,7 @@ static CDVWKInAppBrowser* instance = nil;
         if (weakSelf.inAppBrowserViewController != nil) {
             float osVersion = [[[UIDevice currentDevice] systemVersion] floatValue];
             CGRect frame = [[UIScreen mainScreen] bounds];
+            frame.size.height -= 84;
             if(initHidden && osVersion < 11){
                 frame.origin.x = -10000;
             }
