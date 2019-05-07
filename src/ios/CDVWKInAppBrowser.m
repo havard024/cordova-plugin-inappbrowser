@@ -886,14 +886,31 @@ BOOL isExiting = FALSE;
     // Filter out Navigation Buttons if user requests so
     if (_browserOptions.hidenavigationbuttons) {
         if (_browserOptions.lefttoright) {
-            [self.toolbar setItems:@[flexibleSpaceButton, self.closeButton]];
+            if (_browserOptions.hideclosebutton) {
+                [self.toolbar setItems:@[flexibleSpaceButton]];
+            } else {
+                [self.toolbar setItems:@[flexibleSpaceButton, self.closeButton]];
+            }
+
         } else {
-            [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton]];
+            if (_browserOptions.hideclosebutton) {
+                [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton]];
+            } else {
+                [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton]];
+            }
         }
     } else if (_browserOptions.lefttoright) {
-        [self.toolbar setItems:@[self.backButton, fixedSpaceButton, self.forwardButton, flexibleSpaceButton, self.closeButton]];
+        if (_browserOptions.hideclosebutton) {
+            [self.toolbar setItems:@[self.backButton, fixedSpaceButton, self.forwardButton, flexibleSpaceButton]];
+        } else {
+            [self.toolbar setItems:@[self.backButton, fixedSpaceButton, self.forwardButton, flexibleSpaceButton, self.closeButton]];
+        }
     } else {
-        [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, self.backButton, fixedSpaceButton, self.forwardButton]];
+        if (_browserOptions.hideclosebutton) {
+            [self.toolbar setItems:@[flexibleSpaceButton, self.backButton, fixedSpaceButton, self.forwardButton]];
+        } else {
+            [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, self.backButton, fixedSpaceButton, self.forwardButton]];
+        }
     }
     
     self.view.backgroundColor = [UIColor grayColor];
