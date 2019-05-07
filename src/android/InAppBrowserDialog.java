@@ -25,6 +25,10 @@ import android.content.Context;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewConfiguration;
+
 /**
  * Created by Oliver on 22/11/2013.
  */
