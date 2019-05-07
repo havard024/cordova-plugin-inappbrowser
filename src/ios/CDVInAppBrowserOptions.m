@@ -46,7 +46,7 @@
         self.disallowoverscroll = NO;
         self.hidenavigationbuttons = NO;
         self.closebuttoncolor = nil;
-        self.lefttoright = false;
+        self.lefttoright = true;
         self.toolbarcolor = nil;
         // self.toolbartranslucent = YES;
         self.toolbartranslucent = NO;
