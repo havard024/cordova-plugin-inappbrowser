@@ -315,7 +315,34 @@ static CDVWKInAppBrowser* instance = nil;
         if (weakSelf.inAppBrowserViewController != nil) {
             float osVersion = [[[UIDevice currentDevice] systemVersion] floatValue];
             CGRect frame = [[UIScreen mainScreen] bounds];
-            frame.size.height -= 84;
+
+             // Code below is taken from: https://hype.codes/how-detect-iphone-x-programmatically
+            if([[UIDevice currentDevice]userInterfaceIdiom]==UIUserInterfaceIdiomPhone) {
+
+                switch ((int)[[UIScreen mainScreen] nativeBounds].size.height) {
+
+                    case 1136:
+                        printf("iPhone 5 or 5S or 5C");
+                        frame.size.height -= 50;
+                        break;
+                    case 1334:
+                        printf("iPhone 6/6S/7/8");
+                        frame.size.height -= 50;
+                        break;
+                    case 2208:
+                        printf("iPhone 6+/6S+/7+/8+");
+                        frame.size.height -= 50;
+                        break;
+                    case 2436:
+                        printf("iPhone X");
+                        frame.size.height -= 84;
+                        break;
+                    default:
+                        frame.size.height -= 84;
+                        printf("unknown");
+                }
+            }
+
             if(initHidden && osVersion < 11){
                 frame.origin.x = -10000;
             }
