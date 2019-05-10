@@ -35,7 +35,7 @@
         self.clearcache = NO;
         self.clearsessioncache = NO;
         self.hidespinner = NO;
-        self.hideclosebutton = NO
+        self.hideclosebutton = NO;
 
         self.enableviewportscale = NO;
         self.mediaplaybackrequiresuseraction = NO;
